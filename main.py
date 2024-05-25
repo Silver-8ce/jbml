@@ -261,9 +261,12 @@ if user_prompt := st.chat_input(st.session_state.chat_input_text, key="user_inpu
 
         case "Chat with the Web":
             results, over_rate_limit = get_web_search(st.session_state['web_engine'] , user_prompt)
+        case "Chat with the Web":
+            results, over_rate_limit = get_web_search(st.session_state['web_engine'] , user_prompt)
 
 
 
+            airesponse = st.session_state['llm_chain'].call_web(user_prompt, results)
             airesponse = st.session_state['llm_chain'].call_web(user_prompt, results)
 
             citation = get_web_citation(results)
@@ -330,6 +333,19 @@ if user_prompt := st.chat_input(st.session_state.chat_input_text, key="user_inpu
             time.sleep(0.0035)
     
 
+    #Check to see if the chain exceeds the maximum length
+    if get_len(st.session_state['llm_chain'].chain) > const.MAX_CHAIN_LENGTH: 
+        
+        print("Summarizing Chain: \n")
+        st.session_state['llm_chain'].summarize_chain(const.MIN_SUM_LENGTH)
+        
+        #Check to see if the chain still exceeds the maximum length
+        if get_len(st.session_state['llm_chain'].chain) > const.MAX_CHAIN_LENGTH:
+            
+            print("Chain Too Long - Ending Session")
+            #Disable chat input
+            st.session_state.disabled = True
+            st.rerun()
     #Check to see if the chain exceeds the maximum length
     if get_len(st.session_state['llm_chain'].chain) > const.MAX_CHAIN_LENGTH: 
         
