@@ -2,7 +2,6 @@ import requests
 from pprint import pprint
 import re
 import time
-tokenizer = AutoTokenizer.from_pretrained("mistralai/Mistral-7B-v0.1")
 from prompts import CHAT, RAG
 
 server_url = "https://penguin-true-cow.ngrok-free.app"
@@ -10,7 +9,7 @@ endpoint = "/generate/"
 retrieve_endpoint = '/jbml_retrieve/'
 summary_endpoint = '/summarize/'
 len_endpoint = '/len/'
-
+upload_endpoint = '/query_user_embeddings/'
 
 class LLM_Chain:
     """Creates a chain for the LLM
@@ -105,23 +104,32 @@ class LLM_Chain:
 
         return response
 
-    def call_uploaded(self, prompt:str, context):
+    def call_uploaded(self, prompt:str, payload):
         """Calls LLM with "chat with uploaded files" instructions
         :param prompt: user input to model
         :param context: 
 
         :Returns: str: model response
         """
+        print("Payload" + str(payload))
+        response = requests.post(f"{server_url}{upload_endpoint}",json=payload)
+        if response.status_code == 200:
+            result = response.json()
+            print(result)
+        else:
+            print("Error:", response.status_code, response.text)
+            result = None
         sources = """
         These are sources uploaded by the user, these sources contain the most accurate, reliable, and latest data available. Please use these.
         Here are some results relating to the question I will ask, using these sources, please provide a simple and consise response:
 
         "\n============================================"
         Here are the uploaded results with a file name and summary as reference: \n"""
-        for i, source in enumerate(context["context"]):
+        for i, source in enumerate(result["docs"]):
+            print(source)
             sources += f"""
             Source {i+1}:
-            Information to be used: {source}
+            Information to be used: {source["page_content"]}
             """
 
         sources += f"""\n============================================
@@ -129,7 +137,7 @@ class LLM_Chain:
         Answer:
         """
         response = self.call(sources)
-        return response
+        return response, result
             
     @DeprecationWarning
     def stream(self, prompt):
