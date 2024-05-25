@@ -111,7 +111,7 @@ class LLM_Chain:
 
         :Returns: str: model response
         """
-        print("Payload" + str(payload))
+        #print("Payload" + str(payload))
         response = requests.post(f"{server_url}{upload_endpoint}",json=payload)
         if response.status_code == 200:
             result = response.json()
@@ -126,7 +126,6 @@ class LLM_Chain:
         "\n============================================"
         Here are the uploaded results with a file name and summary as reference: \n"""
         for i, source in enumerate(result["docs"]):
-            print(source)
             sources += f"""
             Source {i+1}:
             Information to be used: {source["page_content"]}
