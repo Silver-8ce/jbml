@@ -1,6 +1,6 @@
 from logging import NullHandler
 import os
-import pprint
+from pprint import pprint
 import pandas as pd
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.document_loaders.csv_loader import CSVLoader
@@ -83,5 +83,4 @@ class FileAdder:
         return self.stored_info
 
     def reset(self):
-        self.stored_info.clear()
-        print("cleared")
+        self.stored_info = []

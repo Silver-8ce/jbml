@@ -261,8 +261,6 @@ if user_prompt := st.chat_input(st.session_state.chat_input_text, key="user_inpu
 
             case "Chat with the Web":
                 results, over_rate_limit = get_web_search(st.session_state['web_engine'] , user_prompt)
-            case "Chat with the Web":
-                results, over_rate_limit = get_web_search(st.session_state['web_engine'] , user_prompt)
 
 
 
@@ -279,7 +277,7 @@ if user_prompt := st.chat_input(st.session_state.chat_input_text, key="user_inpu
             case "Chat With Uploaded Documents":
                 response = ''
                 info = st.session_state.file_adder.get_stored()
-                if len(info) is 0:
+                if len(info) == 0:
                     response = "I can not answer a document question without any uploaded documents. Please upload some documents before asking me again."
                 else:
                     json_data = {"query":user_prompt, "docs":[]}
